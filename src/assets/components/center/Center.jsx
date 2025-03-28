@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import bgImage from "../../../images/artart.jpg";
+import axios from "../../../utils/axiosInstance";
+import { useUser } from "../../../context/UserContext";
 
 const steps = [
   { id: 1, text: "Add your surfboards", icon: "🛹" },
@@ -11,11 +12,26 @@ const steps = [
 ];
 
 function Center({ Carousel }) {
+  const [boards, setBoards] = useState([]);
+  const { user } = useUser();
+
+  useEffect(() => {
+    const fetchBoards = async () => {
+      try {
+        const res = await axios.get("/boards/mine");
+        setBoards(res.data || []);
+      } catch (err) {
+        console.error("Failed to load user boards:", err);
+      }
+    };
+
+    fetchBoards();
+  }, []);
+
   return (
     <div className="flex flex-col items-center w-full bg-gradient-to-b from-sky-50 to-white">
       {/* Surf-Style Carousel Section */}
       <div className="relative w-full overflow-hidden bg-blue-900 text-white">
-        {/* SVG Wave Background */}
         <svg
           className="absolute top-0 left-0 w-full h-full"
           preserveAspectRatio="none"
@@ -27,20 +43,17 @@ function Center({ Carousel }) {
           />
         </svg>
 
-        {/* Carousel + Text */}
         <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-10 px-6 py-28">
-          {/* Carousel */}
           <div className="rounded-3xl shadow-2xl">
             <div className="w-full">{Carousel}</div>
           </div>
 
-          {/* Text Block */}
           <div>
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight text-white">
-              All things surf, <br /> all in one place.
+              All things surfer must, <br /> all in one place.
             </h2>
             <p className="text-lg mb-6 text-white/90">
-              Cams. Forecasts. Reports. Travel. Stories.
+              Sync your quiver. Make you great surfer.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -59,6 +72,102 @@ function Center({ Carousel }) {
           </div>
         </div>
       </div>
+      {boards && (
+        <motion.section
+          className="w-full max-w-6xl px-6 py-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="bg-white/90 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-10">
+            {boards.length === 0 ? (
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="text-center"
+              >
+                <h2 className="text-3xl font-bold text-sky-700 mb-2">
+                  Start Building Your Quiver 🏄
+                </h2>
+                <p className="text-gray-600 max-w-xl mx-auto mb-6">
+                  You haven’t added any boards yet. Let’s get your quiver set up
+                  so we can match you to the right gear for any swell.
+                </p>
+                <Link
+                  to="/add-board"
+                  className="inline-block bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition"
+                >
+                  Add Your First Board →
+                </Link>
+              </motion.div>
+            ) : (
+              <div className="flex flex-col gap-8">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-center"
+                >
+                  <h2 className="text-3xl font-bold text-sky-700 mb-2">
+                    Your Quiver Has {boards.length} Board
+                    {boards.length > 1 && "s"} 🌊
+                  </h2>
+                  <p className="text-gray-600 max-w-xl mx-auto">
+                    Here's your latest setup — dialed and ready. Want to add
+                    another?
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  className="bg-white border border-gray-200 rounded-2xl shadow-md p-6 sm:flex items-center gap-6 hover:shadow-xl transition"
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <img
+                    src={boards[boards.length - 1].image}
+                    alt={`${boards[boards.length - 1].brand} ${
+                      boards[boards.length - 1].model
+                    }`}
+                    className="w-full sm:w-48 h-32 sm:h-40 object-contain rounded-xl mb-4 sm:mb-0"
+                  />
+
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-sky-800 mb-1">
+                      {boards[boards.length - 1].brand} -{" "}
+                      {boards[boards.length - 1].model}
+                    </h3>
+                    <p className="text-gray-700 text-sm mb-2">
+                      <strong>Type:</strong> {boards[boards.length - 1].type}
+                    </p>
+                    <p className="text-gray-700 text-sm mb-2">
+                      <strong>Dims:</strong> {boards[boards.length - 1].length}′
+                      × {boards[boards.length - 1].width}" –{" "}
+                      {boards[boards.length - 1].volume}L
+                    </p>
+                    <p className="text-gray-700 text-sm">
+                      <strong>Fins:</strong> {boards[boards.length - 1].fins}
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-center"
+                >
+                  <Link
+                    to="/add-board"
+                    className="inline-block bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition"
+                  >
+                    Add Another Board →
+                  </Link>
+                </motion.div>
+              </div>
+            )}
+          </div>
+        </motion.section>
+      )}
 
       {/* Hero Section */}
       <motion.section
@@ -79,24 +188,26 @@ function Center({ Carousel }) {
             help you paddle out with confidence — wherever you're headed.
           </p>
 
-          <motion.div
-            className="mt-10 flex gap-4 flex-wrap"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <Link
-              to="/register"
-              className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white px-6 py-3 rounded-2xl text-lg font-semibold shadow-md transition"
+          {!user && (
+            <motion.div
+              className="mt-10 flex gap-4 flex-wrap"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
-              Get Started
-            </Link>
-            <Link
-              to="/signin"
-              className="bg-white border border-gray-300 px-6 py-3 rounded-2xl text-lg font-semibold text-gray-800 shadow-sm hover:shadow-md transition"
-            >
-              I already have an account
-            </Link>
-          </motion.div>
+              <Link
+                to="/register"
+                className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white px-6 py-3 rounded-2xl text-lg font-semibold shadow-md transition"
+              >
+                Get Started
+              </Link>
+              <Link
+                to="/signin"
+                className="bg-white border border-gray-300 px-6 py-3 rounded-2xl text-lg font-semibold text-gray-800 shadow-sm hover:shadow-md transition"
+              >
+                I already have an account
+              </Link>
+            </motion.div>
+          )}
         </div>
 
         {/* How It Works */}

@@ -21,14 +21,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../../context/UserContext";
 import axios from "../../../utils/axiosInstance";
 
-export default function PrimarySearchAppBar() {
+export default function Navbar() {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-  const [anchorElMessages, setAnchorElMessages] = useState(null);
-  const [anchorElNotifications, setAnchorElNotifications] = useState(null);
+
+  // Simulated badge logic
+  const hasMessages = true; // Replace with real message state
+  const hasNotifications = true; // Replace with real notification state
 
   const handleLogout = async () => {
     try {
@@ -43,164 +45,198 @@ export default function PrimarySearchAppBar() {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setMobileMoreAnchorEl(null);
-    setAnchorElMessages(null);
-    setAnchorElNotifications(null);
   };
-
-  const menuId = "primary-account-menu";
-  const mobileMenuId = "primary-mobile-menu";
-
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
-      open={Boolean(anchorEl)}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>My Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My Boards</MenuItem>
-      <Divider />
-      <MenuItem onClick={() => {
-        handleMenuClose();
-        handleLogout();
-      }}>
-        Sign Out
-      </MenuItem>
-    </Menu>
-  );
-
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      transformOrigin={{ vertical: "top", horizontal: "right" }}
-      open={Boolean(mobileMoreAnchorEl)}
-      onClose={handleMenuClose}
-    >
-      {user ? (
-        <>
-          <MenuItem onClick={() => setAnchorElMessages(true)}>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent={2} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <p>Messages</p>
-          </MenuItem>
-          <MenuItem onClick={() => setAnchorElNotifications(true)}>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <p>Notifications</p>
-          </MenuItem>
-          <MenuItem onClick={(e) => setAnchorEl(e.currentTarget)}>
-            <IconButton size="large" color="inherit">
-              <AccountCircle />
-            </IconButton>
-            <p>Profile</p>
-          </MenuItem>
-        </>
-      ) : (
-        <>
-          <MenuItem component={Link} to="/SignIn">Sign In</MenuItem>
-          <MenuItem component={Link} to="/register">Sign Up</MenuItem>
-        </>
-      )}
-    </Menu>
-  );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position="static"
         sx={{
-          background: "linear-gradient(to right, #0077b6, #00b4d8)",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+          background: "linear-gradient(to right, #00b4d8, #0077b6)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
         }}
       >
-        <Toolbar>
-          {/* Hamburger for Mobile */}
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            onClick={(e) => setMobileMoreAnchorEl(e.currentTarget)}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-
-          {/* Logo */}
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          {/* Left: Logo */}
           <Typography
-            variant="h5"
             component={Link}
             to="/"
+            variant="h5"
             sx={{
-              flexGrow: 1,
               fontFamily: `'Pacifico', cursive`,
               color: "#fff",
               textDecoration: "none",
               letterSpacing: 1,
+              mr: 4,
             }}
           >
             SurfSync
           </Typography>
 
-          {/* Desktop Actions */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+          {/* Center: Nav Links */}
+          {user && (
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: 3,
+              }}
+            >
+              <Link
+                to="/"
+                className="text-white text-sm font-medium hover:text-sky-200 transition"
+              >
+                Home
+              </Link>
+              <Link
+                to="/myboards"
+                className="text-white text-sm font-medium hover:text-sky-200 transition"
+              >
+                My Boards
+              </Link>
+              <Link
+                to="/forecast"
+                className="text-white text-sm font-medium hover:text-sky-200 transition"
+              >
+                Forecast
+              </Link>
+            </Box>
+          )}
+
+          {/* Right: Profile / Auth */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {user ? (
               <>
-                <Typography variant="body1" sx={{ color: "#fff", fontWeight: "500" }}>
-                  Welcome, {user.username} 👋
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#fff", fontWeight: 500, mr: 2 }}
+                >
+                  Hey, {user.username} 👋
                 </Typography>
-                <IconButton size="large" color="inherit" onClick={() => setAnchorElMessages(true)}>
-                  <Badge badgeContent={2} color="error">
-                    <MailIcon />
+                <IconButton
+                  size="large"
+                  edge="end"
+                  color="inherit"
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                >
+                  <Badge
+                    variant="dot"
+                    color="error"
+                    overlap="circular"
+                    invisible={!hasMessages && !hasNotifications}
+                  >
+                    <AccountCircle />
                   </Badge>
                 </IconButton>
-                <IconButton size="large" color="inherit" onClick={() => setAnchorElNotifications(true)}>
-                  <Badge badgeContent={4} color="error">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-                <IconButton size="large" edge="end" color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
-                  <AccountCircle />
-                </IconButton>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "right" }}
+                >
+                  <MenuItem onClick={() => navigate("/profile")}>
+                    My Profile
+                  </MenuItem>
+                  <MenuItem onClick={() => navigate("/my-boards")}>
+                    My Boards
+                  </MenuItem>
+                  <MenuItem onClick={() => navigate("/messages")}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <MailIcon fontSize="small" />
+                      Messages
+                      {hasMessages && (
+                        <span className="ml-auto w-2 h-2 bg-red-500 rounded-full" />
+                      )}
+                    </Box>
+                  </MenuItem>
+                  <MenuItem onClick={() => navigate("/notifications")}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <NotificationsIcon fontSize="small" />
+                      Notifications
+                      {hasNotifications && (
+                        <span className="ml-auto w-2 h-2 bg-red-500 rounded-full" />
+                      )}
+                    </Box>
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem
+                    onClick={() => {
+                      handleMenuClose();
+                      handleLogout();
+                    }}
+                  >
+                    Sign Out
+                  </MenuItem>
+                </Menu>
               </>
             ) : (
               <>
-                <Link to="/SignIn" className="text-white hover:text-sky-300 font-medium text-sm">
+                <Link
+                  to="/signin"
+                  className="text-white text-sm font-medium hover:text-sky-200 transition"
+                >
                   Sign In
                 </Link>
-                <Link to="/register" className="text-white hover:text-sky-300 font-medium text-sm">
+                <Link
+                  to="/register"
+                  className="text-white text-sm font-medium hover:text-sky-200 transition"
+                >
                   Sign Up
                 </Link>
               </>
             )}
-          </Box>
 
-          {/* Mobile More Button */}
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={(e) => setMobileMoreAnchorEl(e.currentTarget)}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
+            {/* Mobile Menu */}
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="show more"
+                onClick={(e) => setMobileMoreAnchorEl(e.currentTarget)}
+                color="inherit"
+              >
+                <MoreIcon />
+              </IconButton>
+              <Menu
+                anchorEl={mobileMoreAnchorEl}
+                open={Boolean(mobileMoreAnchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+              >
+                {user ? (
+                  <>
+                    <MenuItem onClick={() => navigate("/profile")}>
+                      My Profile
+                    </MenuItem>
+                    <MenuItem onClick={() => navigate("/my-boards")}>
+                      My Boards
+                    </MenuItem>
+                    <MenuItem onClick={() => navigate("/messages")}>
+                      Messages
+                    </MenuItem>
+                    <MenuItem onClick={() => navigate("/notifications")}>
+                      Notifications
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+                  </>
+                ) : (
+                  <>
+                    <MenuItem onClick={() => navigate("/signin")}>
+                      Sign In
+                    </MenuItem>
+                    <MenuItem onClick={() => navigate("/register")}>
+                      Sign Up
+                    </MenuItem>
+                  </>
+                )}
+              </Menu>
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>
-
-      {/* Menus */}
-      {renderMobileMenu}
-      {renderMenu}
     </Box>
   );
 }
