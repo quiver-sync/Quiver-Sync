@@ -72,7 +72,7 @@ function Center({ Carousel }) {
           </div>
         </div>
       </div>
-      {boards && (
+      {user && (
         <motion.section
           className="w-full max-w-6xl px-6 py-16"
           initial={{ opacity: 0, y: 30 }}
@@ -247,6 +247,7 @@ function Center({ Carousel }) {
             preloaded the forecast — just match your board and go.
           </p>
           <motion.button
+            onClick={() => navigate("/forecast")}
             whileHover={{ scale: 1.05 }}
             className="mt-8 bg-white px-6 py-3 rounded-xl text-sky-600 font-semibold shadow hover:shadow-md hover:bg-blue-50 transition"
           >

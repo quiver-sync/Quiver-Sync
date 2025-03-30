@@ -10,6 +10,7 @@ import AddBoardWizard from './assets/components/boards/AddBoardWizard';
 import { useUser } from './context/UserContext';
 import axios from './utils/axiosInstance';
 import MyBoards from './assets/components/boards/MyBoards';
+import Forecast from './assets/components/forecast/Forecast';
 
 function App() {
   const { setUser } = useUser();
@@ -42,6 +43,7 @@ function App() {
         <Route path="/SignIn" element={<SignIn />} />
         <Route path="/add-board" element={<AddBoardWizard />} /> 
         <Route path='/myboards' element={<MyBoards/>}/>
+        <Route path='/forecast' element={<Forecast/>}/>
       </Routes>
       <Footer />
     </Router>
