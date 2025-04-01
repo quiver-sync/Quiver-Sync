@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -11,15 +11,15 @@ import {
   Divider,
 } from "@mui/material";
 import {
-  Menu as MenuIcon,
   AccountCircle,
   Mail as MailIcon,
   Notifications as NotificationsIcon,
   MoreVert as MoreIcon,
 } from "@mui/icons-material";
+import { Waves } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../../../context/UserContext";
-import axios from "../../../utils/axiosInstance";
+import { useUser } from "../../../../context/UserContext";
+import axios from "../../../../utils/axiosInstance";
 
 export default function Navbar() {
   const { user, setUser } = useUser();
@@ -28,9 +28,8 @@ export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
-  // Simulated badge logic
-  const hasMessages = true; // Replace with real message state
-  const hasNotifications = true; // Replace with real notification state
+  const hasMessages = true;
+  const hasNotifications = true;
 
   const handleLogout = async () => {
     try {
@@ -47,31 +46,34 @@ export default function Navbar() {
     setMobileMoreAnchorEl(null);
   };
 
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position="static"
         sx={{
           background: "linear-gradient(to right, #00b4d8, #0077b6)",
+          backdropFilter: "blur(8px)",
+          position: "sticky",
+          top: 0,
+          zIndex: 1100,
           boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
+        <Toolbar className="flex flex-wrap w-full justify-between items-center px-2 md:px-6">
           {/* Left: Logo */}
-          <Typography
-            component={Link}
-            to="/"
-            variant="h5"
-            sx={{
-              fontFamily: `'Pacifico', cursive`,
-              color: "#fff",
-              textDecoration: "none",
-              letterSpacing: 1,
-              mr: 4,
-            }}
-          >
-            SurfSync
-          </Typography>
+          <div className="flex items-center gap-2 min-w-[140px]">
+            <Waves className="text-sky-600" size={28} />
+            <Link
+              to="/"
+              className="text-2xl text-white font-bold hover:text-sky-200"
+            >
+              QuiverSync
+            </Link>
+          </div>
 
           {/* Center: Nav Links */}
           {user && (
@@ -95,6 +97,12 @@ export default function Navbar() {
                 My Boards
               </Link>
               <Link
+                to="/match"
+                className="text-white text-sm font-medium hover:text-sky-200 transition"
+              >
+                Match Boards
+              </Link>
+              <Link
                 to="/forecast"
                 className="text-white text-sm font-medium hover:text-sky-200 transition"
               >
@@ -104,12 +112,12 @@ export default function Navbar() {
           )}
 
           {/* Right: Profile / Auth */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box className="flex items-center gap-2 px-1 sm:px-2">
             {user ? (
               <>
                 <Typography
                   variant="body2"
-                  sx={{ color: "#fff", fontWeight: 500, mr: 2 }}
+                  className="hidden sm:inline text-white font-medium mr-2"
                 >
                   Hey, {user.username} 👋
                 </Typography>
@@ -125,7 +133,15 @@ export default function Navbar() {
                     overlap="circular"
                     invisible={!hasMessages && !hasNotifications}
                   >
-                    <AccountCircle />
+                    {user?.picture && user.picture !== "/broken-image.jpg" ? (
+                      <img
+                        src={user.picture}
+                        alt="avatar"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <AccountCircle fontSize="large" />
+                    )}
                   </Badge>
                 </IconButton>
 
@@ -210,14 +226,14 @@ export default function Navbar() {
                     <MenuItem onClick={() => navigate("/profile")}>
                       My Profile
                     </MenuItem>
-                    <MenuItem onClick={() => navigate("/my-boards")}>
+                    <MenuItem onClick={() => navigate("/myboards")}>
                       My Boards
                     </MenuItem>
-                    <MenuItem onClick={() => navigate("/messages")}>
-                      Messages
+                    <MenuItem onClick={() => navigate("/forecast")}>
+                      forecase
                     </MenuItem>
-                    <MenuItem onClick={() => navigate("/notifications")}>
-                      Notifications
+                    <MenuItem onClick={() => navigate("/match")}>
+                      match a board
                     </MenuItem>
                     <Divider />
                     <MenuItem onClick={handleLogout}>Sign Out</MenuItem>

@@ -6,7 +6,9 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import axios from "../../../utils/axiosInstance";
-import ForecastCard from "./ForecastCard"
+import ForecastCard from "./ForecastCard";
+import ForecastMultiDay from "./ForecastMultiDay";
+import { getSurfSummary } from "./forecastHelpers";
 
 const containerStyle = {
   width: "100%",
@@ -21,7 +23,8 @@ const defaultCenter = {
 function Forecast() {
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [markerPosition, setMarkerPosition] = useState(null);
-  const [forecast, setForecast] = useState(null);
+  const [currentForecast, setCurrentForecast] = useState(null);
+  const [dailyForecasts, setDailyForecasts] = useState([]);
   const autocompleteRef = useRef(null);
 
   const libraries = ["places"];
@@ -30,7 +33,6 @@ function Forecast() {
     libraries,
   });
 
-  // 📍 When user selects a location from autocomplete
   const handlePlaceSelect = async () => {
     const place = autocompleteRef.current.getPlace();
     if (!place.geometry) return;
@@ -45,7 +47,6 @@ function Forecast() {
     await fetchForecast(lat, lng);
   };
 
-  // 📍 When user clicks "Use My Location"
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
@@ -71,18 +72,17 @@ function Forecast() {
     );
   };
 
-  // 🔁 Called from both location and search
   const fetchForecast = async (lat, lng) => {
     try {
       const res = await axios.post("/forecast", { lat, lng });
-      setForecast(res.data);
-      console.log("📡 Forecast response:", res.data);
+      setCurrentForecast(res.data.current);
+      setDailyForecasts(res.data.daily);
+      console.log("📡 Full Forecast response:", res.data);
     } catch (err) {
       console.error("Forecast error:", err.message);
     }
   };
 
-  // 📦 Try geolocation once when page loads
   useEffect(() => {
     handleUseMyLocation();
   }, []);
@@ -96,7 +96,6 @@ function Forecast() {
           Search a Surf Spot 🌊
         </h1>
 
-        {/* Autocomplete Search Bar */}
         <Autocomplete
           onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
           onPlaceChanged={handlePlaceSelect}
@@ -108,7 +107,6 @@ function Forecast() {
           />
         </Autocomplete>
 
-        {/* Map + Floating Button */}
         <div className="relative">
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -118,7 +116,6 @@ function Forecast() {
             {markerPosition && <Marker position={markerPosition} />}
           </GoogleMap>
 
-          {/* 📍 Use My Location Button */}
           <div className="absolute bottom-6 right-6 z-10">
             <button
               onClick={handleUseMyLocation}
@@ -143,42 +140,62 @@ function Forecast() {
           </div>
         </div>
 
-        {/* Forecast Display */}
-        {forecast && (
+        {currentForecast && (
           <div className="mt-10 bg-gradient-to-br from-white to-sky-50 border border-sky-100 rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-300">
             <h2 className="text-2xl font-bold text-sky-800 mb-6 text-center tracking-tight">
               🌊 Surf Forecast Overview
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sky-900">
+            {(() => {
+              const surf = getSurfSummary(currentForecast);
+              return (
+                <p
+                  className={`text-center text-base font-medium rounded-lg py-3 px-4 mb-6 shadow-sm border transition duration-300 ${surf.color}`}
+                >
+                  {surf.summary}
+                </p>
+              );
+            })()}
+
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sky-900">
               <ForecastCard
                 label="Wave Height"
-                value={`${forecast.waveHeight?.toFixed(1)} m`}
+                value={`${currentForecast.waveHeight?.toFixed(1)} m`}
                 icon="🌊"
                 highlight
               />
               <ForecastCard
                 label="Swell Period"
-                value={`${forecast.swellPeriod?.toFixed(1)} s`}
+                value={`${currentForecast.swellPeriod?.toFixed(1)} s`}
                 icon="🕒"
               />
               <ForecastCard
+                label="Swell Direction"
+                value={`${currentForecast.swellDirection?.toFixed(0)}°)`}
+                icon="🌊"
+              />
+
+              <ForecastCard
                 label="Wind Speed"
-                value={`${forecast.windSpeed?.toFixed(1)} m/s`}
+                value={`${currentForecast.windSpeed?.toFixed(1)} m/s`}
                 icon="💨"
               />
               <ForecastCard
                 label="Wind Direction"
-                value={`${forecast.windDirection?.toFixed(0)}°`}
+                value={`${currentForecast.windDirection?.toFixed(0)}°`}
                 icon="🧭"
               />
               <ForecastCard
                 label="Water Temp"
-                value={`${forecast.waterTemperature?.toFixed(1)} °C`}
+                value={`${currentForecast.waterTemperature?.toFixed(1)} °C`}
                 icon="🌡️"
               />
             </div>
           </div>
+        )}
+
+        {dailyForecasts.length > 0 && (
+          <ForecastMultiDay forecastByDay={dailyForecasts} />
         )}
       </div>
     </div>

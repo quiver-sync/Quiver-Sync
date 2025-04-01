@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "../../../utils/axiosInstance";
-import { useUser } from "../../../context/UserContext";
+import axios from "../../../../utils/axiosInstance";
+import { useUser } from "../../../../context/UserContext";
 
 const steps = [
   { id: 1, text: "Add your surfboards", icon: "🛹" },
   { id: 2, text: "Select a surf spot & dates", icon: "📍" },
   { id: 3, text: "See your best board matches", icon: "🤙" },
-  { id: 4, text: "Find rentals if needed", icon: "🏄‍♂️" },
 ];
 
 function Center({ Carousel }) {
   const [boards, setBoards] = useState([]);
   const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBoards = async () => {
       try {
+        console.log(user);
         const res = await axios.get("/boards/mine");
         setBoards(res.data || []);
       } catch (err) {
@@ -55,26 +56,43 @@ function Center({ Carousel }) {
             <p className="text-lg mb-6 text-white/90">
               Sync your quiver. Make you great surfer.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                to="/register"
-                className="bg-white text-blue-800 font-semibold px-6 py-3 rounded-xl shadow hover:bg-blue-100 transition"
-              >
-                Get started
-              </Link>
-              <Link
-                to="/signin"
-                className="border border-white text-white px-6 py-3 rounded-xl font-medium hover:bg-white/10 transition"
-              >
-                Check the surf
-              </Link>
-            </div>
+            {!user ? (
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  to="/register"
+                  className="bg-white text-blue-800 font-semibold px-6 py-3 rounded-xl shadow hover:bg-blue-100 transition"
+                >
+                  Get started
+                </Link>
+                <Link
+                  to="/signin"
+                  className="border border-white text-white px-6 py-3 rounded-xl font-medium hover:bg-white/10 transition"
+                >
+                  Check the surf
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  to="/match"
+                  className="bg-white text-blue-800 font-semibold px-6 py-3 rounded-xl shadow hover:bg-blue-100 transition"
+                >
+                  Match your boards!
+                </Link>
+                <Link
+                  to="/myboards"
+                  className="border border-white text-white px-6 py-3 rounded-xl font-medium hover:bg-white/10 transition"
+                >
+                  Check boards
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
       {user && (
         <motion.section
-          className="w-full max-w-6xl px-6 py-16"
+          className="w-3xl max-w-6xl px-6 py-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -120,7 +138,7 @@ function Center({ Carousel }) {
                 </motion.div>
 
                 <motion.div
-                  className="bg-white border border-gray-200 rounded-2xl shadow-md p-6 sm:flex items-center gap-6 hover:shadow-xl transition"
+                  className="bg-white border border-gray-200 rounded-2xl shadow-md p-6 sm:flex sm:justify-center sm:items-center gap-6 max-w-4xl mx-auto hover:shadow-xl transition"
                   whileHover={{ scale: 1.01 }}
                 >
                   <img
@@ -131,7 +149,7 @@ function Center({ Carousel }) {
                     className="w-full sm:w-48 h-32 sm:h-40 object-contain rounded-xl mb-4 sm:mb-0"
                   />
 
-                  <div className="flex-1">
+                  <div className="flex-1 text-center sm:text-left">
                     <h3 className="text-xl font-semibold text-sky-800 mb-1">
                       {boards[boards.length - 1].brand} -{" "}
                       {boards[boards.length - 1].model}

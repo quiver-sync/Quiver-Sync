@@ -30,11 +30,11 @@ const Footer = () => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="bg-gradient-to-br from-sky-100 to-blue-200 text-gray-800 border-t border-blue-300 "
+      className="bg-gradient-to-br from-sky-100 to-blue-200 text-gray-800 border-t border-blue-300"
     >
       <WaveDivider />
 
-      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10 text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-10 gap-y-12 text-sm">
         {/* Branding */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -43,13 +43,13 @@ const Footer = () => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Waves className="text-sky-600" size={28} />
-            <h3 className="text-2xl font-bold text-sky-700">SurfSync</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-sky-700">QuiverSync</h3>
           </div>
           <p className="text-gray-600 leading-relaxed">
             Helping surfers match the perfect board to every wave, every session.
           </p>
 
-          <div className="flex gap-4 mt-6 text-sky-600">
+          <div className="flex gap-4 mt-6 text-sky-600 justify-start sm:justify-start md:justify-between flex-wrap">
             <motion.a
               whileHover={{ scale: 1.2, y: -2 }}
               href="https://instagram.com"
@@ -83,7 +83,7 @@ const Footer = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 text-sm sm:text-base"
         >
           <p className="text-md font-semibold mb-2 text-sky-700">Product</p>
           <Link to="/" className="hover:underline">Home</Link>
@@ -97,7 +97,7 @@ const Footer = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 text-sm sm:text-base"
         >
           <p className="text-md font-semibold mb-2 text-sky-700">Company</p>
           <a href="#" className="hover:underline">About Us</a>
@@ -111,7 +111,7 @@ const Footer = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-2 text-sm sm:text-base"
         >
           <p className="text-md font-semibold mb-2 text-sky-700">Support</p>
           <a href="#" className="hover:underline">Contact</a>
@@ -122,7 +122,7 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-blue-300 pt-6 pb-8 text-center text-xs text-gray-500">
-        © {new Date().getFullYear()} SurfSync — Built with 💙 for the ocean community 🌊
+        © {new Date().getFullYear()} QuiverSync — Built with 💙 for the ocean community 🌊
       </div>
     </motion.footer>
   );

@@ -12,6 +12,17 @@ export default function MyBoards() {
   const [currentPage, setCurrentPage] = useState(1);
   const boardsPerPage = 6;
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete("/boards/" + id);
+      setBoards((prev) => prev.filter((board) => board._id !== id));
+      setFiltered((prev) => prev.filter((board) => board._id !== id));
+    } catch (err) {
+      console.error("Delete failed:", err.message);
+    }
+  };
+  
+
   useEffect(() => {
     const fetchBoards = async () => {
       try {
@@ -88,7 +99,9 @@ export default function MyBoards() {
               alt="Empty quiver"
               className="w-24 h-24 mx-auto mb-4 opacity-60"
             />
-            <p className="mb-4">No boards match your search or have been added yet.</p>
+            <p className="mb-4">
+              No boards match your search or have been added yet.
+            </p>
             <Link
               to="/add-board"
               className="inline-block bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-xl font-semibold transition"
@@ -118,10 +131,30 @@ export default function MyBoards() {
                     {board.type}
                   </p>
                   <div className="text-sm text-gray-700 space-y-1">
-                    <p><span className="font-semibold">Length:</span> {board.length}′</p>
-                    <p><span className="font-semibold">Width:</span> {board.width}"</p>
-                    <p><span className="font-semibold">Volume:</span> {board.volume}L</p>
-                    <p><span className="font-semibold">Fins:</span> {board.fins}</p>
+                    <p>
+                      <span className="font-semibold">Length:</span>{" "}
+                      {board.length}′
+                    </p>
+                    <p>
+                      <span className="font-semibold">Width:</span>{" "}
+                      {board.width}"
+                    </p>
+                    <p>
+                      <span className="font-semibold">Volume:</span>{" "}
+                      {board.volume}L
+                    </p>
+                    <p>
+                      <span className="font-semibold">Fins:</span> {board.fins}
+                    </p>
+                  </div>
+
+                  <div>
+                    <button
+                      onClick={() => handleDelete(board._id)}
+                      className="bg-sky-700 hover:bg-sky-800 text-white px-6 py-3 rounded-xl shadow-md text-lg font-semibold transition"
+                    >
+                      Delete board
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -131,7 +164,9 @@ export default function MyBoards() {
             {totalPages > 1 && (
               <div className="flex justify-center items-center mt-12 gap-4">
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                   className={`px-4 py-2 rounded-lg font-semibold ${
                     currentPage === 1
@@ -147,7 +182,9 @@ export default function MyBoards() {
                 </span>
 
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   className={`px-4 py-2 rounded-lg font-semibold ${
                     currentPage === totalPages

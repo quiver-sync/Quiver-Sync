@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
-import axios from "../../../utils/axiosInstance";
-import { useUser } from "../../../context/UserContext";
+import axios from "../../../../utils/axiosInstance";
+import { useUser } from "../../../../context/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

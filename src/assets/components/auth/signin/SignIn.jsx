@@ -1,12 +1,16 @@
 // src/assets/components/signin/SignIn.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../../../context/UserContext";
-import axios from "../../../utils/axiosInstance";
-import { toast } from "react-toastify";
+import { useUser } from "../../../../context/UserContext";
+import axios from "../../../../utils/axiosInstance";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Waves } from "lucide-react";
+
+
 
 function SignIn() {
-  const { setUser } = useUser();
+  const { user,setUser } = useUser();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ email: "", password: "" });
@@ -23,7 +27,7 @@ function SignIn() {
       const response = await axios.post("/auth/login", form);
       setUser(response.data.user);
       toast.success("Welcome back! 🌊");
-      navigate("/");
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Login failed. Please try again."
@@ -34,15 +38,13 @@ function SignIn() {
   };
 
   return (
+    <>
+    <ToastContainer/>
     <div className="min-h-screen flex flex-col justify-center bg-gradient-to-br from-sky-100 via-blue-100 to-sky-200 px-4 py-10">
       <div className="max-w-sm w-full mx-auto bg-white/90 backdrop-blur-sm border border-blue-200 rounded-3xl shadow-xl p-8">
         {/* Header */}
         <div className="text-center">
-          <img
-            className="mx-auto h-12"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-            alt="SurfSync"
-          />
+        <Waves className="text-sky-600 mx-auto h-12" size={40} />
           <h2 className="mt-6 text-2xl font-bold text-sky-800">
             Welcome back, surfer 🌊
           </h2>
@@ -102,6 +104,7 @@ function SignIn() {
         </p>
       </div>
     </div>
+    </>
   );
 }
 
