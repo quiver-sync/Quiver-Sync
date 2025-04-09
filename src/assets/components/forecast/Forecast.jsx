@@ -9,6 +9,8 @@ import axios from "../../../utils/axiosInstance";
 import ForecastCard from "./ForecastCard";
 import ForecastMultiDay from "./ForecastMultiDay";
 import { getSurfSummary } from "./forecastHelpers";
+import { toast, ToastContainer } from "react-toastify";
+
 
 const containerStyle = {
   width: "100%",
@@ -77,8 +79,12 @@ function Forecast() {
       const res = await axios.post("/forecast", { lat, lng });
       setCurrentForecast(res.data.current);
       setDailyForecasts(res.data.daily);
-      console.log("📡 Full Forecast response:", res.data);
+      // console.log("📡 Full Forecast response:", res.data);
     } catch (err) {
+      toast.error("This is not a Surf Spot ! , try again")
+      setCurrentForecast(null);
+      setDailyForecasts([]);
+      // console.log(currentForecast);
       console.error("Forecast error:", err.message);
     }
   };
@@ -90,6 +96,8 @@ function Forecast() {
   if (!isLoaded) return <div className="text-center py-20">Loading map...</div>;
 
   return (
+    <>
+    <ToastContainer/>
     <div className="min-h-screen bg-gradient-to-b from-sky-100 to-white px-4 py-10">
       <div className="max-w-4xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-sky-800 text-center">
@@ -194,12 +202,14 @@ function Forecast() {
           </div>
         )}
 
-        {dailyForecasts.length > 0 && (
+        {dailyForecasts?.length > 0 && (
           <ForecastMultiDay forecastByDay={dailyForecasts} />
         )}
       </div>
     </div>
+    </>
   );
+  
 }
 
 export default Forecast;
