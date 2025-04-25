@@ -13,7 +13,7 @@ const Match = () => {
 
   const [profile, setProfile] = useState(null);
   const [boards, setBoards] = useState([]);
-  const [spotName, setSpotName] = useState([]);
+  const [spotName, setSpotName] = useState(null);
   const [selectedBoards, setSelectedBoards] = useState([]);
   const [showForecast, setShowForecast] = useState(false);
   const [forecastData, setForecastData] = useState(null);
@@ -110,7 +110,7 @@ const Match = () => {
           />
         ) : showForecast ? (
           <>
-            <ForecastSelector onForecastReady={handleForecastReady} />
+            <ForecastSelector onForecastReady={handleForecastReady} setSpotName={setSpotName} />
             {forecastData && (
               <div className="text-center mt-10">
                 <button

@@ -29,7 +29,12 @@ const DayMatchSection = ({ date, predictions, selectedBoards }) => {
     <section className="bg-white border border-sky-100 rounded-3xl shadow-lg p-6 space-y-6">
       <h3 className="text-xl font-semibold text-sky-800">{formattedDate}</h3>
 
-      <div className="flex gap-6 overflow-x-auto">
+      <div
+        className={`
+    flex gap-6 overflow-x-auto 
+    ${paginated.length < 3 ? "justify-center" : "justify-start"}
+  `}
+      >
         {paginated.map((prediction, idx) => {
           const board = selectedBoards.find((b) =>
             prediction.model.toLowerCase().includes(b.model.toLowerCase())
@@ -50,7 +55,7 @@ const DayMatchSection = ({ date, predictions, selectedBoards }) => {
           <button
             disabled={page === 0}
             onClick={() => setPage((p) => p - 1)}
-            className="px-4 py-1 rounded-full bg-sky-100 text-sky-700 disabled:opacity-40"
+            className="px-4 py-1 rounded-full bg-sky-100 text-sky-700 disabled:opacity-40 shadow-sm hover:shadow-lg transition"
           >
             ⬅️ Previous
           </button>
@@ -60,7 +65,7 @@ const DayMatchSection = ({ date, predictions, selectedBoards }) => {
           <button
             disabled={page === totalPages - 1}
             onClick={() => setPage((p) => p + 1)}
-            className="px-4 py-1 rounded-full bg-sky-100 text-sky-700 disabled:opacity-40"
+            className="px-4 py-1 rounded-full bg-sky-100 text-sky-700 disabled:opacity-40 shadow-sm hover:shadow-lg transition"
           >
             Next ➡️
           </button>

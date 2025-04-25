@@ -18,10 +18,10 @@ const defaultCenter = {
   lng: -118.4912,
 };
 
-const SpotForecastSelector = ({ onForecastReady }) => {
+const SpotForecastSelector = ({ onForecastReady , setSpotName }) => {
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [markerPosition, setMarkerPosition] = useState(null);
-  const [spotName, setSpotName] = useState(null);
+  const [spotNameCurrent, setSpotNameCurrent] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(false);
   const autocompleteRef = useRef(null);
@@ -39,10 +39,11 @@ const SpotForecastSelector = ({ onForecastReady }) => {
     const lng = place.geometry.location.lng();
     const name = place.name || place.formatted_address || "Selected Spot";
     console.log(name)
-    setSpotName(name)
-    if (spotName) {
-      console.log(spotName);
-    }    
+    setSpotNameCurrent(name)
+    if (spotNameCurrent) {
+      console.log(spotNameCurrent);
+    }
+    setSpotName(name)    
     setMapCenter({ lat, lng });
     setMarkerPosition({ lat, lng });
 
@@ -54,8 +55,8 @@ const SpotForecastSelector = ({ onForecastReady }) => {
     try {
       const res = await axios.post("/forecast", { lat, lng });
       setForecast(res.data.daily);
-      console.log(spotName);
-      onForecastReady({ lat, lng, forecast: res.data , spotName });
+      console.log(spotNameCurrent);
+      onForecastReady({ lat, lng, forecast: res.data , spotNameCurrent });
     } catch (err) {
       console.error("Forecast error:", err.message);
     } finally {
@@ -99,7 +100,7 @@ const SpotForecastSelector = ({ onForecastReady }) => {
 
       {/* Forecast summary */}
       {Array.isArray(forecast) && forecast.length > 0 && (
-        <ForecastMultiDay forecastByDay={forecast} spotName={spotName}/>
+        <ForecastMultiDay forecastByDay={forecast} spotName={spotNameCurrent}/>
       )}
 
       {/* Loading state */}
