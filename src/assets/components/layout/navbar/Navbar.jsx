@@ -1,5 +1,5 @@
 // Navbar.jsx (split setup start)
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; 
 import {
   AppBar,
   Toolbar,
@@ -25,6 +25,32 @@ export default function Navbar() {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
+  const [hasRentals, setHasRentals] = useState(false);
+
+  useEffect(() => {
+    const checkUserRentals = async () => {
+      if (!user) return;
+
+      try {
+        const res = await axios.get("/boards/getMyRentedBoards");
+        if (Array.isArray(res.data)) {
+          const hasActiveRentals = res.data.some((entry) => entry.rental);
+          setHasRentals(hasActiveRentals);
+        } else {
+          console.warn(
+            "Unexpected response from /boards/getMyRentedBoards",
+            res.data
+          );
+          setHasRentals(false);
+        }
+      } catch (err) {
+        console.error("❌ Failed to check user rentals:", err.message);
+        setHasRentals(false); // fallback to no rentals
+      }
+    };
+
+    checkUserRentals();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -91,6 +117,14 @@ export default function Navbar() {
               >
                 Forecast
               </Link>
+              {hasRentals && (
+                <Link
+                  to="/myrentals"
+                  className="text-white text-sm font-medium hover:text-sky-200"
+                >
+                  My Rentals
+                </Link>
+              )}
             </div>
           )}
 

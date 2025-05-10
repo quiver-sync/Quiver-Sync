@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../../utils/axiosInstance";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ✅ import navigate
 import { motion } from "framer-motion";
-import { FaSearch } from "react-icons/fa";
-import { FaTrashAlt } from "react-icons/fa";
-
+import { FaSearch, FaTrashAlt } from "react-icons/fa";
 
 export default function MyBoards() {
   const [boards, setBoards] = useState([]);
@@ -13,6 +11,8 @@ export default function MyBoards() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const boardsPerPage = 6;
+
+  const navigate = useNavigate(); // ✅ navigation hook
 
   const handleDelete = async (id) => {
     try {
@@ -24,13 +24,29 @@ export default function MyBoards() {
     }
   };
 
+  const handleRent = (boardId) => {
+    navigate(`/rent-board/${boardId}`);
+  };
+
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const res = await axios.get("/boards/mine");
-        const sorted = res.data.sort(
+        const [boardsRes, rentalsRes] = await Promise.all([
+          axios.get("/boards/mine"),
+          axios.get("/rentals/mine"),
+        ]);
+
+        const rentedBoardIds = new Set(rentalsRes.data.map((r) => r.board));
+
+        const mergedBoards = boardsRes.data.map((board) => ({
+          ...board,
+          isRented: rentedBoardIds.has(board._id),
+        }));
+
+        const sorted = mergedBoards.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
+
         setBoards(sorted);
         setFiltered(sorted);
       } catch (err) {
@@ -52,7 +68,7 @@ export default function MyBoards() {
         board.type.toLowerCase().includes(query)
     );
     setFiltered(results);
-    setCurrentPage(1); // reset to first page on new search
+    setCurrentPage(1);
   }, [search, boards]);
 
   const totalPages = Math.ceil(filtered.length / boardsPerPage);
@@ -120,11 +136,19 @@ export default function MyBoards() {
                   className="bg-white rounded-2xl border border-gray-200 shadow hover:shadow-lg transition p-6 flex flex-col items-center text-center"
                   whileHover={{ scale: 1.02 }}
                 >
-                  <img
-                    src={board.image}
-                    alt={board.model}
-                    className="h-40 object-contain mb-4 rounded-xl"
-                  />
+                  <div className="relative w-full h-40 mb-4">
+                    <img
+                      src={board.image}
+                      alt={board.model}
+                      className="w-full h-full object-contain rounded-xl"
+                    />
+                    {board.isRented && (
+                      <span className="absolute top-2 left-2 bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                        Offered for rent
+                      </span>
+                    )}
+                  </div>
+
                   <h3 className="text-xl font-bold text-sky-800 mb-1 tracking-tight">
                     {board.brand} – {board.model}
                   </h3>
@@ -148,15 +172,41 @@ export default function MyBoards() {
                       <span className="font-semibold">Fins:</span> {board.fins}
                     </p>
                   </div>
-
-                  <div>
-                    <button
-                      onClick={() => handleDelete(board._id)}
-                      className="inline-flex items-center gap-2 bg-sky-700 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all duration-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                    >
-                      <FaTrashAlt className="text-white" />
-                      Delete Board
-                    </button>
+                  <div className="mt-5 flex gap-3 w-full justify-center">
+                    <div className="flex-1">
+                      {board.isRented ? (
+                        <button
+                          className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold 
+                        bg-yellow-400 text-white shadow-md 
+                  focus:ring-2 focus:ring-offset-2"
+                        >
+                          Offered for rent
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleRent(board._id)}
+                          className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold 
+               bg-sky-500 text-white shadow-md hover:shadow-lg 
+               hover:bg-sky-600 focus:ring-2 focus:ring-offset-2 focus:ring-sky-400 
+               transition-all duration-200"
+                        >
+                          Rent this Board
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <button
+                        onClick={() => handleDelete(board._id)}
+                        className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold 
+                 border border-red-500 text-red-600 bg-white 
+                 hover:bg-red-50 hover:text-red-700 hover:border-red-600 
+                 focus:ring-2 focus:ring-offset-2 focus:ring-red-400 
+                 transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <FaTrashAlt />
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}

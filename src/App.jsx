@@ -15,6 +15,9 @@ import Forecast from './assets/components/forecast/Forecast';
 import Profile from './assets/components/profile/Profile';
 import Match from './assets/components/match/Match';
 import Resume from './assets/components/resume/Resume';
+import RentBoard from './assets/components/rental/RentBoard';
+import MyRentals from './assets/components/rental/MyRentals';
+
 
 function App() {
   const { setUser } = useUser();
@@ -54,6 +57,11 @@ function App() {
         <Route path='/match' element={<Match/>}/>
         <Route path='/resume' element={<Resume/>}/>
         <Route path='/pushdb' element={<PushBoardsToDB/>}/>
+        <Route path='/rent-board/:boardId' element={<RentBoard/>}/>
+        <Route path='/myrentals' element={<MyRentals />} />
+
+
+
         
 
       </Routes>
