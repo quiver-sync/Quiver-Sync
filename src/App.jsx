@@ -17,6 +17,10 @@ import Match from './assets/components/match/Match';
 import Resume from './assets/components/resume/Resume';
 import RentBoard from './assets/components/rental/RentBoard';
 import MyRentals from './assets/components/rental/MyRentals';
+import ExploreRentals from './assets/components/rental/ExploreRentals';
+import RentRequest from './assets/components/rental/RentRequest';
+
+
 
 
 function App() {
@@ -59,6 +63,9 @@ function App() {
         <Route path='/pushdb' element={<PushBoardsToDB/>}/>
         <Route path='/rent-board/:boardId' element={<RentBoard/>}/>
         <Route path='/myrentals' element={<MyRentals />} />
+        <Route path="/explore-rentals" element={<ExploreRentals />} />
+        <Route path="/rent-request/:rentalId" element={<RentRequest />} />
+
 
 
 

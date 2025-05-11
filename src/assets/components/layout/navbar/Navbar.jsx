@@ -1,5 +1,5 @@
 // Navbar.jsx (split setup start)
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -117,6 +117,13 @@ export default function Navbar() {
               >
                 Forecast
               </Link>
+              <Link
+                to="/explore-rentals"
+                className="hover:underline text-white"
+              >
+                Explore Rentals
+              </Link>
+
               {hasRentals && (
                 <Link
                   to="/myrentals"

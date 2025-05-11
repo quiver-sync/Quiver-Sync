@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../../utils/axiosInstance";
-import { Link, useNavigate } from "react-router-dom"; // ✅ import navigate
+import { Link, useNavigate } from "react-router-dom"; 
 import { motion } from "framer-motion";
 import { FaSearch, FaTrashAlt } from "react-icons/fa";
 
@@ -12,7 +12,7 @@ export default function MyBoards() {
   const [currentPage, setCurrentPage] = useState(1);
   const boardsPerPage = 6;
 
-  const navigate = useNavigate(); // ✅ navigation hook
+  const navigate = useNavigate(); 
 
   const handleDelete = async (id) => {
     try {
@@ -35,30 +35,46 @@ export default function MyBoards() {
           axios.get("/boards/mine"),
           axios.get("/rentals/mine"),
         ]);
-
-        const rentedBoardIds = new Set(rentalsRes.data.map((r) => r.board));
-
-        const mergedBoards = boardsRes.data.map((board) => ({
-          ...board,
-          isRented: rentedBoardIds.has(board._id),
-        }));
-
+  
+        console.log("📦 Raw boards from /boards/mine:");
+        console.table(boardsRes.data);
+  
+        console.log("📦 Raw rentals from /rentals/mine:");
+        console.table(rentalsRes.data);
+  
+        const rentedBoardIds = new Set(
+          rentalsRes.data.map((r) =>
+            typeof r.board === "string" ? r.board : r.board._id.toString()
+          )
+        );
+  
+        console.log("🆔 Rented board IDs:");
+        console.table([...rentedBoardIds]);
+  
+        const mergedBoards = boardsRes.data.map((board) => {
+          const isRented = rentedBoardIds.has(board._id.toString());
+          console.log(
+            `🔍 Checking board ${board.model} (${board._id}): rented = ${isRented}`
+          );
+          return { ...board, isRented };
+        });
+  
         const sorted = mergedBoards.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-
+  
         setBoards(sorted);
         setFiltered(sorted);
       } catch (err) {
-        console.error("Failed to load boards:", err);
+        console.error("❌ Failed to load boards or rentals:", err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchBoards();
   }, []);
-
+  
   useEffect(() => {
     const query = search.toLowerCase();
     const results = boards.filter(
@@ -74,6 +90,8 @@ export default function MyBoards() {
   const totalPages = Math.ceil(filtered.length / boardsPerPage);
   const startIdx = (currentPage - 1) * boardsPerPage;
   const currentBoards = filtered.slice(startIdx, startIdx + boardsPerPage);
+
+  console.log(currentBoards)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white px-6 py-16">
@@ -195,6 +213,18 @@ export default function MyBoards() {
                       )}
                     </div>
                     <div className="flex-1">
+                    {board.isRented ? (
+                      <button
+                      // onClick={() => handleDelete(board._id)}
+                      className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold 
+               border border-yellow-500 text-yellow-600 bg-white
+               transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      
+                      rented
+                    </button>
+                      
+                    ):(
                       <button
                         onClick={() => handleDelete(board._id)}
                         className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold 
@@ -206,6 +236,8 @@ export default function MyBoards() {
                         <FaTrashAlt />
                         Delete
                       </button>
+                    )
+}
                     </div>
                   </div>
                 </motion.div>

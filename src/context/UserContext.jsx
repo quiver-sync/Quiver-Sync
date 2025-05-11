@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
         });
       } catch (err) {
           try {
-            const refresh = await axios.post("/auth/refresh"); // expects cookies
+            const refresh = await axios.post("/auth/refresh"); 
             console.log("🔁 Refreshed access token");
   
             // try profile again
