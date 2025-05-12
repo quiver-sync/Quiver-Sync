@@ -19,6 +19,12 @@ import RentBoard from './assets/components/rental/RentBoard';
 import MyRentals from './assets/components/rental/MyRentals';
 import ExploreRentals from './assets/components/rental/ExploreRentals';
 import RentRequest from './assets/components/rental/RentRequest';
+import RentalRequestsReceived from './assets/components/rental/RentalRequestsReceived';
+import MyRequests from './assets/components/rental/MyRequests';
+import ActiveRentals from './assets/components/rental/ActiveRentals';
+
+
+
 
 
 
@@ -65,6 +71,13 @@ function App() {
         <Route path='/myrentals' element={<MyRentals />} />
         <Route path="/explore-rentals" element={<ExploreRentals />} />
         <Route path="/rent-request/:rentalId" element={<RentRequest />} />
+        <Route path="/rental-requests/received" element={<RentalRequestsReceived />} />
+        <Route path="/my-requests" element={<MyRequests />} />
+        <Route path="/active-rentals" element={<ActiveRentals />} />
+
+
+
+
 
 
 

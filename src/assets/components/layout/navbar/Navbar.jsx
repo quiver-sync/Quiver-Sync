@@ -119,7 +119,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/explore-rentals"
-                className="hover:underline text-white"
+                className="hover:underline text-sm text-white"
               >
                 Explore Rentals
               </Link>
@@ -132,6 +132,24 @@ export default function Navbar() {
                   My Rentals
                 </Link>
               )}
+              <Link
+                to="/rental-requests/received"
+                className="text-white text-sm font-medium hover:text-sky-200"
+              >
+                Rentals offers
+              </Link>
+              <Link
+                to="/my-requests"
+                className="hover:underline text-sm text-white"
+              >
+                my requests
+              </Link>
+              <Link
+                to="/active-rentals"
+                className="hover:underline text-sm text-white"
+              >
+                Rentals
+              </Link>
             </div>
           )}
 

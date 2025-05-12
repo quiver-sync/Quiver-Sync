@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../../context/UserContext"; // adjust path if needed
+import { useUser } from "../../../context/UserContext";
 
 const ExploreRentals = () => {
   const [rentals, setRentals] = useState([]);
-  const navigate = useNavigate();
   const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadRentals = async () => {
+    const fetchRentals = async () => {
       try {
-        console.log("📤 Sending request to /rentals/available");
         const res = await axios.get("/rentals/available");
 
         const filtered = user
@@ -19,17 +18,12 @@ const ExploreRentals = () => {
           : res.data;
 
         setRentals(filtered);
-        console.log("✅ Rentals received (filtered):", filtered);
       } catch (err) {
-        console.error(
-          "❌ Error loading rentals:",
-          err.response?.status,
-          err.response?.data
-        );
+        console.error("❌ Failed to fetch rentals:", err);
       }
     };
 
-    loadRentals();
+    if (user) fetchRentals();
   }, [user]);
 
   return (
@@ -40,14 +34,15 @@ const ExploreRentals = () => {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {rentals.map((rental) => {
-          const board = rental.board;
+          const { _id, board, bookedDates, location, availableUntil, pricePerDay } = rental;
+
           return (
             <div
-              key={rental._id}
+              key={_id}
               className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-200 flex flex-col overflow-hidden"
             >
               {board?.image && (
-                <div className="w-full h-56 bg-gradient-to-b from-sky-50 to-white flex items-center justify-center">
+                <div className="w-full h-56 flex items-center justify-center bg-sky-50">
                   <img
                     src={board.image}
                     alt={board.model}
@@ -58,45 +53,43 @@ const ExploreRentals = () => {
 
               <div className="flex-1 p-5 flex flex-col justify-between">
                 <div className="space-y-1 mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {board?.model}
-                  </h2>
+                  <h2 className="text-xl font-semibold text-gray-900">{board?.model}</h2>
+                  <p className="text-sm text-gray-500">Brand: <span className="font-medium text-gray-700">{board?.brand}</span></p>
+                  <p className="text-sm text-gray-500">Type: <span className="text-gray-700">{board?.type}</span></p>
                   <p className="text-sm text-gray-500">
-                    Brand:{" "}
-                    <span className="font-medium text-gray-700">
-                      {board?.brand}
-                    </span>
+                    Size: <span className="text-gray-700">{board?.length}' × {board?.width}" — {board?.volume}L</span>
                   </p>
-                  <p className="text-sm text-gray-500">
-                    Type: <span className="text-gray-700">{board?.type}</span>
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Size:{" "}
-                    <span className="text-gray-700">
-                      {board?.length}' × {board?.width}" — {board?.volume}L
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Fins: <span className="text-gray-700">{board?.fins}</span>
-                  </p>
+                  <p className="text-sm text-gray-500">Fins: <span className="text-gray-700">{board?.fins}</span></p>
+
+                  {bookedDates?.length > 0 && (
+                    <div className="text-xs text-orange-600 mt-3">
+                      🚫 Booked Dates:
+                      <ul className="list-disc list-inside">
+                        {bookedDates.map((range, idx) => (
+                          <li key={idx}>
+                            {new Date(range.start).toLocaleDateString()} →{" "}
+                            {new Date(range.end).toLocaleDateString()}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
                 <div className="text-sm text-gray-600 mb-2">
-                  <span className="inline-block mr-2">
-                    📍 {rental.location} -
-                  </span>
-                  <span className="inline-block">
-                    📅 Until {new Date(rental.availableUntil).toLocaleDateString()}
-                  </span>
+                  📍 {location} — 📅 Until {new Date(availableUntil).toLocaleDateString()}
                 </div>
 
                 <div className="flex items-center justify-between">
                   <p className="text-lg font-semibold text-blue-600">
-                    ${rental.pricePerDay}
-                    <span className="text-sm"> / day</span>
+                    ${pricePerDay}<span className="text-sm"> / day</span>
                   </p>
                   <button
-                    onClick={() => navigate(`/rent-request/${rental._id}`)}
+                    onClick={() =>
+                      navigate(`/rent-request/${_id}`, {
+                        state: { bookedDates: bookedDates || [] }
+                      })
+                    }
                     className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition"
                   >
                     Request Rental

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../../utils/axiosInstance";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 const RentRequest = () => {
   const { rentalId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [rental, setRental] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [error, setError] = useState("");
+
+  const bookedDates = location.state?.bookedDates || [];
+  console.log(bookedDates)
+  
 
   useEffect(() => {
     const loadRental = async () => {
@@ -23,18 +28,25 @@ const RentRequest = () => {
     loadRental();
   }, [rentalId]);
 
-  if (!rental)
-    return <p className="text-center mt-20">Loading rental details...</p>;
-
-  const board = rental.board;
-  const today = new Date().toISOString().split("T")[0];
-  const maxDate = new Date(rental.availableUntil).toISOString().split("T")[0];
+  const isOverlappingBookedRange = (start, end) => {
+    return bookedDates.some(({ start: bStart, end: bEnd }) => {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      const bookedStart = new Date(bStart);
+      const bookedEnd = new Date(bEnd);
+      return startDate <= bookedEnd && endDate >= bookedStart;
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!startDate || !endDate) {
       setError("Please select both start and end dates.");
+      return;
+    }
+
+    if (isOverlappingBookedRange(startDate, endDate)) {
+      setError("Selected dates overlap with existing bookings.");
       return;
     }
 
@@ -43,8 +55,8 @@ const RentRequest = () => {
         rentalId,
         startDate,
         endDate,
+        board: rental.board,
       });
-
       navigate("/my-requests");
     } catch (err) {
       console.error("Failed to submit rental request:", err);
@@ -52,7 +64,13 @@ const RentRequest = () => {
     }
   };
 
-  // 🧮 Calculate total days and price
+  if (!rental)
+    return <p className="text-center mt-20">Loading rental details...</p>;
+
+  const board = rental.board;
+  const today = new Date().toISOString().split("T")[0];
+  const maxDate = new Date(rental.availableUntil).toISOString().split("T")[0];
+
   const getTotalPrice = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -124,7 +142,7 @@ const RentRequest = () => {
 
           {pricing && (
             <p className="text-blue-800 text-center font-medium text-lg mt-1">
-               Total Days: {pricing.days} —  Total Price: ${pricing.total}
+              Total Days: {pricing.days} — Total Price: ${pricing.total}
             </p>
           )}
 
